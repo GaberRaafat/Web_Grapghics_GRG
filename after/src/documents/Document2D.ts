@@ -21,6 +21,7 @@ class Document2D implements IDocument{
     activeCommand:ICommand | null = null;
     wallCommand:CreateWallCommand;
     onWallCreated?: (start: Vector3, end: Vector3) => void;
+    onWallDrawingCanceled?: () => void;
     private raycaster: Raycaster;
     private mouse: Vector2;
     private walls: WallObject[] = [];
@@ -301,7 +302,10 @@ class Document2D implements IDocument{
         this.activeCommand = this.wallCommand;
     }
     disableWallDrawing() {
-        this.activeCommand = null;
+        if (this.activeCommand === this.wallCommand) {
+            this.wallCommand.cleanup(); // Call cleanup to remove event listeners
+            this.activeCommand = null;
+        }
     }
     clearAllWalls() {
         // Remove all walls and their associated elements
