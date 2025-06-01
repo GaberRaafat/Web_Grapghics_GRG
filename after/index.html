@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Viewer  App</title>
+<style>
+      #app{
+        height: 100vh;
+        width: 100%;
+      
+        
+      }
+      body{
+        margin: 0;
+        padding: 0;
+      }
+      .toolbar{
+          position: fixed;
+      top: 50%;
+      right: 50px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 8px 0 0 8px;
+      box-shadow: -2px 2px 10px rgba(0, 0, 0, 0.2);
+
+      }
+      .toolbar button {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .toolbar button:hover {
+      background: linear-gradient(135deg, #4338ca, #2563eb);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      transform: translateX(-2px);
+    }
+
+    .toolbar button:active {
+      transform: scale(0.98);
+      background: linear-gradient(135deg, #3730a3, #1d4ed8);
+    }
+
+    .toolbar button.active {
+      background: linear-gradient(135deg, #047857, #059669);
+      box-shadow: 0 0 12px rgba(4, 120, 87, 0.3);
+    }
+
+    .toolbar button.active:hover {
+      background: linear-gradient(135deg, #065f46, #047857);
+    }
+
+    .dimension-label {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      color: #333;
+      pointer-events: none;
+      transform: translate(-50%, -50%);
+      border: 1px solid #ccc;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+
+    .wall-info-panel {
+      position: fixed;
+      left: 20px;
+      top: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      padding: 20px;
+      border-radius: 12px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      color: #333;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      width: 250px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      z-index: 1000;
+    }
+
+    .wall-info-panel h2 {
+      margin: 0 0 15px 0;
+      color: #2563eb;
+      font-size: 18px;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+
+    .wall-info-panel .wall-list {
+      max-height: 300px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+
+    .wall-info-panel .wall-item {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.2s ease;
+    }
+
+    .wall-info-panel .wall-item:hover {
+      transform: translateX(5px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .wall-info-panel .wall-property {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .wall-info-panel .property-label {
+      color: #64748b;
+      font-weight: 500;
+    }
+
+    .wall-info-panel .property-value {
+      color: #1e293b;
+      font-weight: 600;
+    }
+
+    .wall-info-panel::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .wall-info-panel::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+
+    .wall-info-panel::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 4px;
+    }
+    </style>
+  </head>
+  <body>
+    
+    <div id="app"></div>
+    <div class="wall-info-panel">
+      <h2>Wall Information</h2>
+      <div class="wall-list" id="wallList">
+        <!-- Wall items will be added here dynamically -->
+      </div>
+    </div>
+     <div class="toolbar">
+    <button id='toggleViewsBtn'>Toggle Views</button>
+    <button id="zoomFitBtn">Zoom Fit</button>
+    <button id="drawWallBtn">Draw Wall</button>
+    <button id="clearAllBtn">Clear All</button>
+  </div>
+    
+    <script type="module">
+      import { Viewer } from './src/Viewer.ts'
+
+        const container = document.querySelector('#app');
+        const viewer = new Viewer(container);
+        viewer.animate();
+        var is2D=true;
+      //  if(viewer.activeDocument instanceof Document2D){
+      //    var doc2=viewer.activeDocument ;
+
+      //  }
+
+        document.querySelector('#toggleViewsBtn')?.addEventListener('click',()=>{
+          is2D=!is2D;
+          if(is2D){
+            viewer.setView('2d');
+          }else{
+            viewer.setView('3d');
+          }
+        })
+
+ document.querySelector('#zoomFitBtn')?.addEventListener('click', () => {
+        viewer.zoomFit(1);
+    })
+
+    document.querySelector('#drawWallBtn')?.addEventListener('click', (e) => {
+        const button = e.currentTarget;
+        if (button instanceof HTMLButtonElement) {
+            const isActive = button.classList.toggle('active');
+            if (isActive) {
+                viewer.enableWallDrawing();
+            } else {
+                viewer.disableWallDrawing();
+            }
+        }
+    })
+
+    document.querySelector('#clearAllBtn')?.addEventListener('click', () => {
+        if (confirm('Are you sure you want to remove all walls?')) {
+            viewer.clearAllWalls();
+        }
+    });
+
+    </script>
+  </body>
+</html>
