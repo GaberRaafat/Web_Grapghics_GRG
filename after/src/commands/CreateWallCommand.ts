@@ -14,13 +14,10 @@ export class CreateWallCommand implements ICommand {
 
     constructor(document: Document2D) {
         this.document = document;
-        // Create bound handler for keyboard events
         this.keyDownHandler = this.onKeyDown.bind(this);
-        // Add keyboard event listener
         window.addEventListener('keydown', this.keyDownHandler);
     }
 
-    // Add cleanup method to remove event listener
     cleanup() {
         window.removeEventListener('keydown', this.keyDownHandler);
         this.resetDrawing();
@@ -29,7 +26,6 @@ export class CreateWallCommand implements ICommand {
     private onKeyDown(e: KeyboardEvent) {
         if (e.key === 'Escape' && this.isDrawing) {
             this.resetDrawing();
-            // Notify Document2D to exit wall drawing mode
             this.document.disableWallDrawing();
         }
     }
@@ -46,14 +42,12 @@ export class CreateWallCommand implements ICommand {
             this.startPoint = this.document.unproject(new Vector3(this.mouse.x, this.mouse.y, 0));
             this.isDrawing = true;
         } else {
-            // Second click - set end point and create wall
             const endPoint = this.document.unproject(new Vector3(this.mouse.x, this.mouse.y, 0));
             if (this.startPoint && endPoint.distanceTo(this.startPoint) > 0.1) {
                 this.endPoint = endPoint;
                 this.execute();
                 
                 if (e.shiftKey) {
-                    // Continue drawing from end point
                     this.startPoint = this.endPoint;
                     this.endPoint = null;
                 } else {
@@ -88,7 +82,6 @@ export class CreateWallCommand implements ICommand {
         const length = wallVec.length();
         const angle = Math.atan2(wallVec.y, wallVec.x);
 
-        // Remove existing preview wall if it exists
         if (this.previewWall) {
             this.document.removeObject(this.previewWall);
             if (this.previewWall.geometry) {
